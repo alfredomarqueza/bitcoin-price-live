@@ -10,58 +10,84 @@ import currencies from './supported-currencies.json';
 console.log(currencies)
 
 class App extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     // chart.js defaults
     Chart.defaults.global.defaultFontColor = '#000';
     Chart.defaults.global.defaultFontSize = 16;
 
-    this.state = {historicalData: null, currency: "USD", culture: "en-US"};
+    this.state = { historicalData: null, currentPrice: null, currency: "USD", culture: "en-US" };
     this.onCurrencySelect = this.onCurrencySelect.bind(this);
     this.onCultureSelect = this.onCultureSelect.bind(this);
 
   }
 
-  componentDidMount () {
-    this.getBitcoinData();
+  componentDidMount() {
+    this.getHistoricalData();
+    this.getCurrentPrice();
+
+    this.interval = setInterval(this.getCurrentPrice.bind(this), 10000);
   }
 
-  getBitcoinData () {
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  getHistoricalData() {
     fetch(`https://api.coindesk.com/v1/bpi/historical/close.json?currency=${this.state.currency}`)
       .then(response => response.json())
-      .then(historicalData => this.setState({historicalData}))
+      .then(historicalData => this.setState({ historicalData }))
       .catch(e => e)
   }
 
-  chartOptions () {
-    
+  getCurrentPrice() {
+    fetch(`https://api.coindesk.com/v1/bpi/currentprice/${this.state.currency}.json`)
+      .then(response => response.json())
+      .then(currentPrice => this.setState({ currentPrice }))
+      .catch(e => e)
+  }
+
+  chartOptions() {
+
     return {
-        scales: {
-            yAxes: [{
-                ticks: {
-                    
-                    callback: ((value, index, values) => {                      
-                        return new Intl.NumberFormat(this.state.culture, { style: 'currency', currency: this.state.currency }).format(value);
-                    })//.bind(this)
-                }
-            }]
-        },
+      scales: {
+        yAxes: [{
+          ticks: {
 
-        tooltips: {
-          callbacks: {
-                label: function(tooltipItem, data) {
-                    var value = data.datasets[0].data[tooltipItem.index];
-                    return new Intl.NumberFormat(this.state.culture, { style: 'currency', currency: this.state.currency }).format(value);
-                }.bind(this)
-          } 
+            callback: ((value, index, values) => {
+              return new Intl.NumberFormat(this.state.culture, { style: 'currency', currency: this.state.currency }).format(value);
+            })//.bind(this)
+          }
+        }]
+      },
+
+      tooltips: {
+        callbacks: {
+          label: function (tooltipItem, data) {
+            var value = data.datasets[0].data[tooltipItem.index];
+            return new Intl.NumberFormat(this.state.culture, { style: 'currency', currency: this.state.currency }).format(value);
+          }.bind(this)
         }
+      }
     }
-}
+  }
 
-  formatChartData () {
-    
-    const {bpi} = this.state.historicalData;        
+  formatCurrectPrice() {
+    if (this.state.currentPrice != null && this.state.currentPrice.bpi[this.state.currency] != null) {
+
+      const rate_float = this.state.currentPrice.bpi[this.state.currency].rate_float;
+
+      return Intl.NumberFormat(this.state.culture,
+        { style: 'currency', currency: this.state.currency })
+        .format(rate_float);
+    }
+
+  }
+
+  formatChartData() {
+
+    const { bpi } = this.state.historicalData;
     moment.locale(this.state.culture);
     return {
       labels: Object.keys(bpi).map(date => moment(date).format("ll")),
@@ -92,57 +118,58 @@ class App extends Component {
     }
   }
 
-  setCurrency (currency) {
-    this.setState({currency}, this.getBitcoinData)
+  setCurrency(currency) {
+    this.setState({ currency }, ()=>{this.getHistoricalData();this.getCurrentPrice();})
   }
 
-  onCurrencySelect (e) {
+  onCurrencySelect(e) {
     this.setCurrency(e.target.value)
   }
 
-  setCulture (culture) {
-    this.setState({culture});
+  setCulture(culture) {
+    this.setState({ culture });
   }
 
-  onCultureSelect (e) {
+  onCultureSelect(e) {
     this.setCulture(e.target.value)
   }
 
   render() {
-    if (this.state.historicalData) {
+    if (this.state.currentPrice && this.state.historicalData) {
       return (
         <div className="app">
           <Header title="BITCOIN PRICE INDEX" />
 
           <div className="select-container">
-            <span style={{fontSize: 18, fontFamily: 'Bungee'}}> Select your currency: </span>
+            <span style={{ fontSize: 18, fontFamily: 'Bungee' }}> Select your currency: </span>
             <select value={this.state.currency} onChange={this.onCurrencySelect}>
               {currencies.map((obj, index) =>
                 <option key={`${index}-${obj.country}`} value={obj.currency}> {obj.currency} </option>
               )}
             </select>
-             {
+            {
               /* this.state.currency !== 'USD' && (<div>
                 <a href="#" className="link" onClick={() => this.setCurrency('USD')} style={{color: "black", fontSize: 16, fontFamily: 'Bungee'}}> [CLICK HERE TO RESET] </a>
               </div>) */
-            } 
+            }
           </div>
 
           <div className="select-container">
-            <span style={{fontSize: 18, fontFamily: 'Bungee'}}> Select your culture: </span>
-            <select value={this.state.culture} onChange={this.onCultureSelect}>              
-                <option  value="en-US"> United States </option>
-                <option  value="es-MX"> Mexico </option>              
-            </select>            
+            <span style={{ fontSize: 18, fontFamily: 'Bungee' }}> Select your culture: </span>
+            <select value={this.state.culture} onChange={this.onCultureSelect}>
+              <option value="en-US"> United States </option>
+              <option value="es-MX"> Mexico </option>
+            </select>
           </div>
 
-          <div style={{marginTop: 10}}>
-            <Line options={this.chartOptions()}  data={this.formatChartData()} height={250} />
+          <div style={{ marginTop: 10 }}>
+            <span style={{ fontSize: 18, fontFamily: 'Bungee' }}> Last price: {this.formatCurrectPrice()}</span>
+            <Line options={this.chartOptions()} data={this.formatChartData()} height={250} />
           </div>
         </div>
       )
 
-      
+
     }
 
     return null
