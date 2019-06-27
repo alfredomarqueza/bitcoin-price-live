@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
 import Header from './components/Header';
 import './App.css';
-//import _ from 'lodash';
 import { Line, Chart } from 'react-chartjs-2';
 import moment from 'moment';
 import 'moment/locale/es';
 import currencies from './supported-currencies.json';
-
-console.log(currencies)
 
 class App extends Component {
   constructor(props) {
@@ -119,7 +116,7 @@ class App extends Component {
   }
 
   setCurrency(currency) {
-    this.setState({ currency }, ()=>{this.getHistoricalData();this.getCurrentPrice();})
+    this.setState({ currency }, () => { this.getHistoricalData(); this.getCurrentPrice(); })
   }
 
   onCurrencySelect(e) {
@@ -135,42 +132,47 @@ class App extends Component {
   }
 
   render() {
-    if (this.state.currentPrice && this.state.historicalData) {
-      return (
-        <div className="app">
-          <Header title="BITCOIN PRICE INDEX" />
+    return (
+      <div className="app">
+        <Header title="BITCOIN PRICE INDEX" />
 
-          <div className="select-container">
-            <span style={{ fontSize: 18, fontFamily: 'Bungee' }}> Select your currency: </span>
-            <select value={this.state.currency} onChange={this.onCurrencySelect}>
-              {currencies.map((obj, index) =>
-                <option key={`${index}-${obj.country}`} value={obj.currency}> {obj.currency} </option>
-              )}
-            </select>
-            {
-              /* this.state.currency !== 'USD' && (<div>
-                <a href="#" className="link" onClick={() => this.setCurrency('USD')} style={{color: "black", fontSize: 16, fontFamily: 'Bungee'}}> [CLICK HERE TO RESET] </a>
-              </div>) */
-            }
-          </div>
-
-          <div className="select-container">
-            <span style={{ fontSize: 18, fontFamily: 'Bungee' }}> Select your culture: </span>
-            <select value={this.state.culture} onChange={this.onCultureSelect}>
-              <option value="en-US"> United States </option>
-              <option value="es-MX"> Mexico </option>
-            </select>
-          </div>
-
-          <div style={{ marginTop: 10 }}>
-            <span style={{ fontSize: 18, fontFamily: 'Bungee' }}> Last price: {this.formatCurrectPrice()}</span>
-            <Line options={this.chartOptions()} data={this.formatChartData()} height={250} />
-          </div>
+        <div className="select-container">
+          <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Select your currency: </span>
+          <select value={this.state.currency} onChange={this.onCurrencySelect}>
+            {currencies.map((obj, index) =>
+              <option key={`${index}-${obj.country}`} value={obj.currency}> {obj.currency} </option>
+            )}
+          </select>
+          {
+            /* this.state.currency !== 'USD' && (<div>
+              <a href="#" className="link" onClick={() => this.setCurrency('USD')} style={{color: "black", fontSize: 16, fontFamily: 'Arial Black'}}> [CLICK HERE TO RESET] </a>
+            </div>) */
+          }
         </div>
-      )
 
+        <div className="select-container">
+          <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Select your culture: </span>
+          <select value={this.state.culture} onChange={this.onCultureSelect}>
+            <option value="en-US"> United States </option>
+            <option value="es-MX"> Mexico </option>
+          </select>
+        </div>
 
-    }
+        <div style={{ marginTop: 10 }}>
+          {this.state.currentPrice ? (
+            <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}>
+              Last price: <input type="text" value={this.formatCurrectPrice()} readonly></input>
+            </span>
+          ) : (<span></span>)}
+          <br />
+          <br />
+          <br />
+          {this.state.historicalData ? (
+            <Line options={this.chartOptions()} data={this.formatChartData()} height={250} />
+          ) : (<span></span>)}
+        </div>
+      </div>
+    )
 
     return null
   }
