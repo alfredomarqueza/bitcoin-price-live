@@ -14,7 +14,7 @@ class App extends Component {
     Chart.defaults.global.defaultFontColor = '#000';
     Chart.defaults.global.defaultFontSize = 16;
 
-    this.state = { historicalData: null, currentPrice: null, currency: "USD", culture: "en-US" };
+    this.state = { historicalData: null, currentPrice: null, currency: "USD", culture: "en-US", countdown:10 };
     this.onCurrencySelect = this.onCurrencySelect.bind(this);
     this.onCultureSelect = this.onCultureSelect.bind(this);
 
@@ -24,11 +24,24 @@ class App extends Component {
     this.getHistoricalData();
     this.getCurrentPrice();
 
-    this.interval = setInterval(this.getCurrentPrice.bind(this), 10000);
+    this.interval = setInterval(this.countDownTimer.bind(this), 1000);
   }
 
   componentWillUnmount() {
     clearInterval(this.interval);
+  }
+
+  countDownTimer()
+  {
+    let countdown = this.state.countdown -1 ; 
+    if(countdown == -1)
+    {
+      countdown = 10;
+      this.getCurrentPrice();
+
+    }
+    this.setState({countdown});
+
   }
 
   getHistoricalData() {
@@ -116,7 +129,7 @@ class App extends Component {
   }
 
   setCurrency(currency) {
-    this.setState({ currency }, () => { this.getHistoricalData(); this.getCurrentPrice(); })
+    this.setState({ currency }, () => { this.getHistoricalData(); this.getCurrentPrice(); });
   }
 
   onCurrencySelect(e) {
@@ -161,7 +174,7 @@ class App extends Component {
         <div style={{ marginTop: 10 }}>
           {this.state.currentPrice ? (
             <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}>
-              Last price: <input type="text" value={this.formatCurrectPrice()} readonly></input>
+              Last price: <input type="text" value={this.formatCurrectPrice()} readonly></input> {this.state.countdown}
             </span>
           ) : (<span></span>)}
           <br />
