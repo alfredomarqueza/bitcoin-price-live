@@ -5,6 +5,8 @@ import { Line, Chart } from 'react-chartjs-2';
 import moment from 'moment';
 import 'moment/locale/es';
 import currencies from './supported-currencies.json';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 class App extends Component {
   constructor(props) {
@@ -14,7 +16,11 @@ class App extends Component {
     Chart.defaults.global.defaultFontColor = '#000';
     Chart.defaults.global.defaultFontSize = 16;
 
-    this.state = { historicalData: null, currentPrice: null, currency: "USD", culture: "en-US", countdown:10 };
+    let endDate = new Date();
+    let startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - 1);
+
+    this.state = { historicalData: null, currentPrice: null, currency: "USD", culture: "en-US", countdown: 10, startDate: startDate, endDate: endDate };
     this.onCurrencySelect = this.onCurrencySelect.bind(this);
     this.onCultureSelect = this.onCultureSelect.bind(this);
 
@@ -24,28 +30,51 @@ class App extends Component {
     this.getHistoricalData();
     this.getCurrentPrice();
 
-    this.interval = setInterval(this.countDownTimer.bind(this), 1000);
+    this.interval = setInterval(this.countDownTimer.bind(this), 3000);
   }
 
   componentWillUnmount() {
     clearInterval(this.interval);
   }
 
-  countDownTimer()
-  {
-    let countdown = this.state.countdown -1 ; 
-    if(countdown == -1)
-    {
+  countDownTimer() {
+    let countdown = this.state.countdown - 3;
+    if (countdown == -2) {
       countdown = 10;
       this.getCurrentPrice();
 
     }
-    this.setState({countdown});
+    this.setState({ countdown });
 
   }
 
+  appendLeadingZeroes(n){
+    if(n <= 9){
+      return "0" + n;
+    }
+    return n
+  }
+
+  formatDate(date) {
+
+    let formatted_date = date.getFullYear() + "-" + this.appendLeadingZeroes(date.getMonth() + 1) + "-" + this.appendLeadingZeroes(date.getDate());
+    return formatted_date;
+
+  }
+
+  endDate_handleChange(date) {
+    this.setState({endDate: date}, () => {this.getHistoricalData();});
+  }
+
+  startDate_handleChange(date) {
+    this.setState({startDate: date}, () => {this.getHistoricalData();});
+  }
+
   getHistoricalData() {
-    fetch(`https://api.coindesk.com/v1/bpi/historical/close.json?currency=${this.state.currency}`)
+    let startDate = this.formatDate(this.state.startDate);
+    let endDate = this.formatDate(this.state.endDate);
+
+    fetch(`https://api.coindesk.com/v1/bpi/historical/close.json?currency=${this.state.currency}&start=${startDate}&end=${endDate}`)
       .then(response => response.json())
       .then(historicalData => this.setState({ historicalData }))
       .catch(e => e)
@@ -178,7 +207,17 @@ class App extends Component {
             </span>
           ) : (<span></span>)}
           <br />
+          <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Start date: </span>
+          <DatePicker
+            selected={this.state.startDate}
+            onChange={this.startDate_handleChange.bind(this)}
+          />
           <br />
+          <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> End date: </span>
+          <DatePicker
+            selected={this.state.endDate}
+            onChange={this.endDate_handleChange.bind(this)}
+          />
           <br />
           {this.state.historicalData ? (
             <Line options={this.chartOptions()} data={this.formatChartData()} height={250} />

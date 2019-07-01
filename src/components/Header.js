@@ -6,9 +6,8 @@ const Header = props => (
       <span className="header"> {props.title} </span>
     </div>
 
-    <div className="subheader-body">
-      <span className="subheader"> Written by <a className="link" href="https://markonsoftware.com">@MarkFChavez</a>. </span>
-      <span className="subheader"> Upgraded by <a className="link" href="https://twitter.com/alfredomarqueza">@alfredomarqueza</a> . </span>
+    <div className="subheader-body">      
+      <span className="subheader"> By <a className="link" href="https://twitter.com/alfredomarqueza">@alfredomarqueza</a></span>
     </div>
   </header>
 )
