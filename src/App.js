@@ -7,6 +7,9 @@ import 'moment/locale/es';
 import currencies from './supported-currencies.json';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { registerLocale, setDefaultLocale } from  "react-datepicker";
+import es from 'date-fns/locale/es';
+registerLocale('es', es);
 
 class App extends Component {
   constructor(props) {
@@ -176,7 +179,7 @@ class App extends Component {
   render() {
     return (
       <div className="app">
-        <Header title="BITCOIN PRICE INDEX" />
+        <Header title="BITCOIN PRICE LIVE" />
 
         <div className="select-container">
           <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Select your currency: </span>
@@ -196,7 +199,7 @@ class App extends Component {
           <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Select your culture: </span>
           <select value={this.state.culture} onChange={this.onCultureSelect}>
             <option value="en-US"> United States </option>
-            <option value="es-MX"> Mexico </option>
+            <option value="es"> Spain </option>
           </select>
         </div>
 
@@ -211,12 +214,16 @@ class App extends Component {
           <DatePicker
             selected={this.state.startDate}
             onChange={this.startDate_handleChange.bind(this)}
+            dateFormat="MMMM d, yyyy"
+            locale={this.state.culture}
           />
           <br />
           <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> End date: </span>
           <DatePicker
             selected={this.state.endDate}
             onChange={this.endDate_handleChange.bind(this)}
+            dateFormat="MMMM d, yyyy"
+            locale={this.state.culture}
           />
           <br />
           {this.state.historicalData ? (
