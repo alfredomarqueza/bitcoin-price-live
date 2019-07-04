@@ -7,7 +7,7 @@ span.arialBlack { font-family: 'Arial Black', cursive; }
 .app {
   max-width: 720px;
   margin: 0 auto;
-  text-align: center;
+  /* text-align: center; */
 }
 
 .header { font-size: 60px; font-family: 'Arial Black', cursive; }
@@ -41,7 +41,7 @@ a.link:hover {
   border-bottom: 2px solid #000;
 }
 
-.select-container select {
+.select-container{
   /*padding: 10px;
    border: none;
   box-shadow: none;
@@ -54,6 +54,6 @@ a.link:hover {
   color: #137e81;
 }
 
-.select-container select:focus {
+.select-container:focus {
   outline: none;
 }
