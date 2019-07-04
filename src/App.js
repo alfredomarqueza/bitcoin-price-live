@@ -246,11 +246,14 @@ class App extends Component {
                 {this.state.currentPriceError? 
                   (<span>{this.state.currentPriceError}</span>):
                   (this.state.currentPrice ? (
+                    <span>
                     <input type="text" className={this.state.currentPriceLabelStyle} value={this.formatCurrectPrice()} readOnly></input>                    
+                    &nbsp;<span style={{ fontSize: 14, fontFamily: 'Arial' }} className={this.state.updatedLabelStyle}>updated!</span>
+                    </span>
                     ) : (<span>Loading...</span>))
                 }                
               </span>          
-              &nbsp;<span className={this.state.updatedLabelStyle}>updated!</span>
+              
           <br />
           {this.state.historicalDataError? 
             (<span>{this.state.historicalDataError}</span>):
