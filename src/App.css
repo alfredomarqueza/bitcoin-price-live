@@ -18,13 +18,22 @@ a.link {
   color: #ff1769;
 }
 
-.updatedValue {     
+.initialVisible {     
   opacity: 1;
 }
 
-.oldValue {   
+.initialInvisible {     
+  opacity: 0;
+}
+
+.fadeIn {   
+  opacity: 1; 
+  transition: opacity 1s;  
+}
+
+.fadeOut {   
   opacity: 0; 
-  transition: all 3s;
+  transition: opacity 0.3s;
 }
 
 a.link:hover {

@@ -19,8 +19,6 @@ class App extends Component {
     Chart.defaults.global.defaultFontColor = '#000';
     Chart.defaults.global.defaultFontSize = 16;
 
-    this.countdown = 10;
-
     let endDate = new Date();
     let startDate = new Date();
     startDate.setMonth(startDate.getMonth() - 1);
@@ -34,8 +32,8 @@ class App extends Component {
       endDate: endDate,
       currentPriceError: null,
       historicalData: null,
-      updateClass: "updatedValue",
-      updateMessage: ""
+      currentPriceLabelStyle : "initialVisible",
+      updatedLabelStyle : "initialInvisible"
     };
     this.onCurrencySelect = this.onCurrencySelect.bind(this);
     this.onCultureSelect = this.onCultureSelect.bind(this);
@@ -46,30 +44,26 @@ class App extends Component {
     this.getHistoricalData();
     this.getCurrentPrice();
 
-    this.interval = setInterval(this.countDownTimer.bind(this), 1000);
+    this.interval = setInterval(this.updateCurrentPrice.bind(this), 10000);
   }
 
   componentWillUnmount() {
     clearInterval(this.interval);
   }
 
-  countDownTimer() {
-    let countdown = this.countdown - 1;
-    if (countdown == 0) {
-      countdown = 10;
-      this.getCurrentPrice();
-      this.setState({ updateClass:"updatedValue" });      
-      this.setState({ updateMessage:"updated!" });
-    }
-    else if(this.countdown == 3)
-    {
-      this.setState({ updateClass:"oldValue" });
-    }else if(this.countdown == 9)
-    {
-      this.setState({ updateMessage:"" });
-    }
+  updateCurrentPrice() {
 
-    this.countdown = countdown;
+    this.setState({ currentPriceLabelStyle : "fadeOut"});
+
+    this.getCurrentPrice();
+
+    setTimeout(() => {
+
+      this.setState({ currentPriceLabelStyle : "fadeIn", updatedLabelStyle : "fadeIn" });      
+      setTimeout(() => {
+        this.setState({ updatedLabelStyle : "fadeOut" });      
+      }, 600);
+    }, 300);                
     
   }
 
@@ -252,11 +246,11 @@ class App extends Component {
                 {this.state.currentPriceError? 
                   (<span>{this.state.currentPriceError}</span>):
                   (this.state.currentPrice ? (
-                    <input type="text" className={this.state.updateClass} value={this.formatCurrectPrice()} readOnly></input>                    
+                    <input type="text" className={this.state.currentPriceLabelStyle} value={this.formatCurrectPrice()} readOnly></input>                    
                     ) : (<span>Loading...</span>))
                 }                
               </span>          
-              &nbsp;<span>{this.state.updateMessage}</span>
+              &nbsp;<span className={this.state.updatedLabelStyle}>updated!</span>
           <br />
           {this.state.historicalDataError? 
             (<span>{this.state.historicalDataError}</span>):
