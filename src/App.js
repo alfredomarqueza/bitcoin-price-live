@@ -19,6 +19,8 @@ class App extends Component {
     Chart.defaults.global.defaultFontColor = '#000';
     Chart.defaults.global.defaultFontSize = 16;
 
+    this.countdown = 10;
+
     let endDate = new Date();
     let startDate = new Date();
     startDate.setMonth(startDate.getMonth() - 1);
@@ -28,22 +30,23 @@ class App extends Component {
       currentPrice: null,
       currency: "USD",
       culture: "en-US",
-      countdown: 10,
       startDate: startDate,
       endDate: endDate,
       currentPriceError: null,
-      historicalData: null
+      historicalData: null,
+      updateClass: "updatedValue",
+      updateMessage: ""
     };
     this.onCurrencySelect = this.onCurrencySelect.bind(this);
     this.onCultureSelect = this.onCultureSelect.bind(this);
 
-  }
+  }  
 
   componentDidMount() {
     this.getHistoricalData();
     this.getCurrentPrice();
 
-    this.interval = setInterval(this.countDownTimer.bind(this), 3000);
+    this.interval = setInterval(this.countDownTimer.bind(this), 1000);
   }
 
   componentWillUnmount() {
@@ -51,14 +54,23 @@ class App extends Component {
   }
 
   countDownTimer() {
-    let countdown = this.state.countdown - 3;
-    if (countdown == -2) {
+    let countdown = this.countdown - 1;
+    if (countdown == 0) {
       countdown = 10;
       this.getCurrentPrice();
-
+      this.setState({ updateClass:"updatedValue" });      
+      this.setState({ updateMessage:"updated!" });
     }
-    this.setState({ countdown });
+    else if(this.countdown == 3)
+    {
+      this.setState({ updateClass:"oldValue" });
+    }else if(this.countdown == 9)
+    {
+      this.setState({ updateMessage:"" });
+    }
 
+    this.countdown = countdown;
+    
   }
 
   appendLeadingZeroes(n) {
@@ -234,15 +246,17 @@ class App extends Component {
             locale={this.state.culture}
           />
           <br />
-          <br />          
-          {this.state.currentPriceError? 
-            (<span>{this.state.currentPriceError}</span>):
-            (this.state.currentPrice ? (
-              <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}>
-                Last price: <input type="text" value={this.formatCurrectPrice()} readonly></input> {this.state.countdown}
-              </span>
-              ) : (<span>Loading...</span>))
-          }
+          <br />
+          <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}>
+                Last price:&nbsp;  
+                {this.state.currentPriceError? 
+                  (<span>{this.state.currentPriceError}</span>):
+                  (this.state.currentPrice ? (
+                    <input type="text" className={this.state.updateClass} value={this.formatCurrectPrice()} readOnly></input>                    
+                    ) : (<span>Loading...</span>))
+                }                
+              </span>          
+              &nbsp;<span>{this.state.updateMessage}</span>
           <br />
           {this.state.historicalDataError? 
             (<span>{this.state.historicalDataError}</span>):

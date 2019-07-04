@@ -18,6 +18,15 @@ a.link {
   color: #ff1769;
 }
 
+.updatedValue {     
+  opacity: 1;
+}
+
+.oldValue {   
+  opacity: 0; 
+  transition: all 3s;
+}
+
 a.link:hover {
   text-decoration: none;
   border-bottom: 2px solid #000;
