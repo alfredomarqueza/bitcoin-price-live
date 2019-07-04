@@ -7,7 +7,7 @@ import 'moment/locale/es';
 import currencies from './supported-currencies.json';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { registerLocale, setDefaultLocale } from  "react-datepicker";
+import { registerLocale, setDefaultLocale } from "react-datepicker";
 import es from 'date-fns/locale/es';
 registerLocale('es', es);
 
@@ -23,7 +23,17 @@ class App extends Component {
     let startDate = new Date();
     startDate.setMonth(startDate.getMonth() - 1);
 
-    this.state = { historicalData: null, currentPrice: null, currency: "USD", culture: "en-US", countdown: 10, startDate: startDate, endDate: endDate };
+    this.state = {
+      historicalData: null,
+      currentPrice: null,
+      currency: "USD",
+      culture: "en-US",
+      countdown: 10,
+      startDate: startDate,
+      endDate: endDate,
+      currentPriceError: null,
+      historicalData: null
+    };
     this.onCurrencySelect = this.onCurrencySelect.bind(this);
     this.onCultureSelect = this.onCultureSelect.bind(this);
 
@@ -51,8 +61,8 @@ class App extends Component {
 
   }
 
-  appendLeadingZeroes(n){
-    if(n <= 9){
+  appendLeadingZeroes(n) {
+    if (n <= 9) {
       return "0" + n;
     }
     return n
@@ -66,11 +76,11 @@ class App extends Component {
   }
 
   endDate_handleChange(date) {
-    this.setState({endDate: date}, () => {this.getHistoricalData();});
+    this.setState({ endDate: date }, () => { this.getHistoricalData(); });
   }
 
   startDate_handleChange(date) {
-    this.setState({startDate: date}, () => {this.getHistoricalData();});
+    this.setState({ startDate: date }, () => { this.getHistoricalData(); });
   }
 
   getHistoricalData() {
@@ -79,15 +89,19 @@ class App extends Component {
 
     fetch(`https://api.coindesk.com/v1/bpi/historical/close.json?currency=${this.state.currency}&start=${startDate}&end=${endDate}`)
       .then(response => response.json())
-      .then(historicalData => this.setState({ historicalData }))
-      .catch(e => e)
+      .then(historicalData => this.setState({ historicalData, historicalDataError: null }))
+      .catch((error) => {
+        this.setState({ historicalDataError: error.message })
+      })
   }
 
   getCurrentPrice() {
     fetch(`https://api.coindesk.com/v1/bpi/currentprice/${this.state.currency}.json`)
       .then(response => response.json())
-      .then(currentPrice => this.setState({ currentPrice }))
-      .catch(e => e)
+      .then(currentPrice => this.setState({ currentPrice, currentPriceError: null }))
+      .catch((error) => {
+        this.setState({ currentPriceError: error.message })
+      })
   }
 
   chartOptions() {
@@ -203,13 +217,7 @@ class App extends Component {
           </select>
         </div>
 
-        <div style={{ marginTop: 10 }}>
-          {this.state.currentPrice ? (
-            <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}>
-              Last price: <input type="text" value={this.formatCurrectPrice()} readonly></input> {this.state.countdown}
-            </span>
-          ) : (<span></span>)}
-          <br />
+        <div style={{ marginTop: 10 }}>          
           <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Start date: </span>
           <DatePicker
             selected={this.state.startDate}
@@ -226,9 +234,23 @@ class App extends Component {
             locale={this.state.culture}
           />
           <br />
-          {this.state.historicalData ? (
-            <Line options={this.chartOptions()} data={this.formatChartData()} height={250} />
-          ) : (<span></span>)}
+          <br />          
+          {this.state.currentPriceError? 
+            (<span>{this.state.currentPriceError}</span>):
+            (this.state.currentPrice ? (
+              <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}>
+                Last price: <input type="text" value={this.formatCurrectPrice()} readonly></input> {this.state.countdown}
+              </span>
+              ) : (<span>Loading...</span>))
+          }
+          <br />
+          {this.state.historicalDataError? 
+            (<span>{this.state.historicalDataError}</span>):
+            (this.state.historicalData ? (
+              <Line options={this.chartOptions()} data={this.formatChartData()} height={250} />
+              ) : (<span>Loading...</span>)
+            )
+          }
         </div>
       </div>
     )
