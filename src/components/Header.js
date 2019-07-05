@@ -6,7 +6,7 @@ const Header = props => (
       <span className="header"> {props.title} </span>
     </div>
 
-    <div className="subheader-body">      
+    <div style={{textAlign:'right'}} className="subheader-body">      
       <span className="subheader"> By <a className="link" href="https://twitter.com/alfredomarqueza">@alfredomarqueza</a></span>
     </div>
   </header>

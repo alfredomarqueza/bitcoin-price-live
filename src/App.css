@@ -41,19 +41,19 @@ a.link:hover {
   border-bottom: 2px solid #000;
 }
 
-.select-container{
+.input-element{
   /*padding: 10px;
    border: none;
   box-shadow: none;
   background: transparent;
   background-image: none;
   -webkit-appearance: none; */
-  font-size: 20px;
-  font-family: 'Arial Black', cursive;
   cursor: pointer;
+  font-size: 15px;
+  font-family: 'Arial Black', cursive;  
   color: #137e81;
 }
 
-.select-container:focus {
+.input-element:focus {
   outline: none;
 }

@@ -201,13 +201,13 @@ class App extends Component {
     return (
       <div className="app">
         <Header title="BITCOIN PRICE LIVE" />
-        <Container  fluid>
-          <Row justify="center">
-            <Col >
+        <Container  fluid style={{ lineHeight: '32px' }}>
+          <Row justify="end">
+            <Col xs="content" >
               <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Select your currency: </span>
             </Col>
-            <Col >
-              <select className="select-container" value={this.state.currency} onChange={this.onCurrencySelect}>
+            <Col xs={6} >
+              <select className="input-element" value={this.state.currency} onChange={this.onCurrencySelect}>
                 {currencies.map((obj, index) =>
                   <option key={`${index}-${obj.country}`} value={obj.currency}> {obj.currency} </option>
                 )}
@@ -219,23 +219,23 @@ class App extends Component {
               }
           </Col>
         </Row>
-        <Row justify="center">
-          <Col >        
+        <Row justify="end">
+          <Col xs="content">        
             <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Select your culture: </span>
           </Col>
-          <Col>
-            <select className="select-container" value={this.state.culture} onChange={this.onCultureSelect}>
+          <Col xs={6}>
+            <select className="input-element" value={this.state.culture} onChange={this.onCultureSelect}>
               <option value="en-US"> United States </option>
               <option value="es"> Spain </option>
             </select>
           </Col>
           </Row>
-          <Row justify="center">
-            <Col>        
+          <Row justify="end">
+            <Col xs="content">        
               <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Start date: </span>
             </Col>
-            <Col>        
-              <DatePicker
+            <Col xs={6}>        
+              <DatePicker className="input-element"
                 selected={this.state.startDate}
                 onChange={this.startDate_handleChange.bind(this)}
                 dateFormat="MMMM d, yyyy"
@@ -243,12 +243,12 @@ class App extends Component {
               />
             </Col>
           </Row>
-          <Row justify="center">
-            <Col>        
+          <Row justify="end">
+            <Col xs="content">        
               <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> End date: </span>
             </Col>
-            <Col>        
-              <DatePicker
+            <Col xs={6}>        
+              <DatePicker className="input-element"
                 selected={this.state.endDate}
                 onChange={this.endDate_handleChange.bind(this)}
                 dateFormat="MMMM d, yyyy"
@@ -256,12 +256,12 @@ class App extends Component {
               />
             </Col>
           </Row>
-          <Row justify="center">
-            <Col>        
+          <Row justify="end">
+            <Col xs="content">        
               <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}>
                     Last price:</span>
             </Col>
-            <Col>        
+            <Col xs={6}>        
               {this.state.currentPriceError? 
                 (<span>{this.state.currentPriceError}</span>):
                 (this.state.currentPrice ? (
