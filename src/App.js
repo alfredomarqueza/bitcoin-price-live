@@ -240,6 +240,7 @@ class App extends Component {
                 onChange={this.startDate_handleChange.bind(this)}
                 dateFormat="MMMM d, yyyy"
                 locale={this.state.culture}
+                maxDate={new Date()}
               />
             </Col>
           </Row>
@@ -253,6 +254,7 @@ class App extends Component {
                 onChange={this.endDate_handleChange.bind(this)}
                 dateFormat="MMMM d, yyyy"
                 locale={this.state.culture}
+                maxDate={new Date()}
               />
             </Col>
           </Row>
