@@ -1,3 +1,8 @@
+// Bitcoin Price Live
+// 2019
+// By @alfredomarqueza
+// Base version by @MarkFChavez
+
 import React, { Component } from 'react';
 import Header from './components/Header';
 import './App.css';
@@ -68,20 +73,6 @@ class App extends Component {
     
   }
 
-  appendLeadingZeroes(n) {
-    if (n <= 9) {
-      return "0" + n;
-    }
-    return n
-  }
-
-  formatDate(date) {
-
-    let formatted_date = date.getFullYear() + "-" + this.appendLeadingZeroes(date.getMonth() + 1) + "-" + this.appendLeadingZeroes(date.getDate());
-    return formatted_date;
-
-  }
-
   endDate_handleChange(date) {
     this.setState({ endDate: date }, () => { this.getHistoricalData(); });
   }
@@ -91,8 +82,8 @@ class App extends Component {
   }
 
   getHistoricalData() {
-    let startDate = this.formatDate(this.state.startDate);
-    let endDate = this.formatDate(this.state.endDate);
+    let startDate = moment(this.state.startDate).format("YYYY-MM-DD");
+    let endDate = moment(this.state.endDate).format("YYYY-MM-DD");
 
     fetch(`https://api.coindesk.com/v1/bpi/historical/close.json?currency=${this.state.currency}&start=${startDate}&end=${endDate}`)
       .then(response => response.json())
