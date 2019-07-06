@@ -13,9 +13,15 @@ import 'moment/locale/es';
 import currencies from './supported-currencies.json';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { registerLocale, setDefaultLocale } from "react-datepicker";
+import { registerLocale } from "react-datepicker";
 import es from 'date-fns/locale/es';
+import ru from 'date-fns/locale/ru';
+import enUS from 'date-fns/locale/en-US';
+import ja from 'date-fns/locale/ja';
 registerLocale('es', es);
+registerLocale('en-US', enUS);
+registerLocale('ja', ja);
+registerLocale('ru', ru);
 
 class App extends Component {
   constructor(props) {
@@ -37,7 +43,6 @@ class App extends Component {
       startDate: startDate,
       endDate: endDate,
       currentPriceError: null,
-      historicalData: null,
       currentPriceLabelStyle : "initialVisible",
       updatedLabelStyle : "initialInvisible"
     };
@@ -200,7 +205,7 @@ class App extends Component {
             <Col xs={6} >
               <select className="input-element" value={this.state.currency} onChange={this.onCurrencySelect}>
                 {currencies.map((obj, index) =>
-                  <option key={`${index}-${obj.country}`} value={obj.currency}> {obj.currency} </option>
+                  <option key={`${index}-${obj.country}`} value={obj.currency}> {obj.currency} - {obj.country}</option>
                 )}
               </select>
               {
@@ -217,7 +222,10 @@ class App extends Component {
           <Col xs={6}>
             <select className="input-element" value={this.state.culture} onChange={this.onCultureSelect}>
               <option value="en-US"> United States </option>
-              <option value="es"> Spain </option>
+              <option value="es-MX"> Mexico </option>
+              <option value="ja"> Japan </option>
+              <option value="ru"> Russia </option>
+              <option value="es"> Spain </option>              
             </select>
           </Col>
           </Row>
@@ -278,8 +286,6 @@ class App extends Component {
         
       </div>
     )
-
-    return null
   }
 }
 
