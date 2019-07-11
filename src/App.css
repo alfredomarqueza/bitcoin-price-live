@@ -54,6 +54,13 @@ a.link:hover {
   color: #137e81;
 }
 
+.dataLabel
+{
+  font-size: 15px;
+  font-family: 'Arial Black', cursive;  
+  color: #137e81;
+}
+
 .input-element:focus {
   outline: none;
 }

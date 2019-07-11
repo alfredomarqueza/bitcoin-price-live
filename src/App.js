@@ -44,7 +44,7 @@ class App extends Component {
       endDate: endDate,
       currentPriceError: null,
       currentPriceLabelStyle : "initialVisible",
-      updatedLabelStyle : "initialInvisible"
+      lastUpdateDate : ""
     };
     this.onCurrencySelect = this.onCurrencySelect.bind(this);
     this.onCultureSelect = this.onCultureSelect.bind(this);
@@ -69,11 +69,7 @@ class App extends Component {
     this.getCurrentPrice();
 
     setTimeout(() => {
-
-      this.setState({ currentPriceLabelStyle : "fadeIn", updatedLabelStyle : "fadeIn" });      
-      setTimeout(() => {
-        this.setState({ updatedLabelStyle : "fadeOut" });      
-      }, 600);
+      this.setState({ currentPriceLabelStyle : "fadeIn"});            
     }, 300);                
     
   }
@@ -101,7 +97,7 @@ class App extends Component {
   getCurrentPrice() {
     fetch(`https://api.coindesk.com/v1/bpi/currentprice/${this.state.currency}.json`)
       .then(response => response.json())
-      .then(currentPrice => this.setState({ currentPrice, currentPriceError: null }))
+      .then(currentPrice => this.setState({ currentPrice, currentPriceError: null, lastUpdateDate: moment(new Date()).format("HH:mm:ss A") }))
       .catch((error) => {
         this.setState({ currentPriceError: error.message })
       })
@@ -222,7 +218,6 @@ class App extends Component {
           <Col xs={6}>
             <select className="input-element" value={this.state.culture} onChange={this.onCultureSelect}>
               <option value="en-US"> United States </option>
-              <option value="es-MX"> Mexico </option>
               <option value="ja"> Japan </option>
               <option value="ru"> Russia </option>
               <option value="es"> Spain </option>              
@@ -267,8 +262,8 @@ class App extends Component {
                 (<span>{this.state.currentPriceError}</span>):
                 (this.state.currentPrice ? (
                   <span>
-                  <input type="text" className={this.state.currentPriceLabelStyle} value={this.formatCurrectPrice()} readOnly></input>                    
-                  &nbsp;<span style={{ fontSize: 14, fontFamily: 'Arial' }} className={this.state.updatedLabelStyle}>updated!</span>
+                  <span className={`${this.state.currentPriceLabelStyle} dataLabel`}>{this.formatCurrectPrice()}</span>                    
+                  &nbsp;&nbsp;&nbsp;<span style={{ fontSize: 12, fontFamily: 'Arial' }} className={this.state.currentPriceLabelStyle}>{this.state.lastUpdateDate}</span>
                   </span>
                   ) : (<span>Loading...</span>))
               }                                        
