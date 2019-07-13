@@ -10,6 +10,8 @@ import { Container, Row, Col } from 'react-grid-system';
 import { Line, Chart } from 'react-chartjs-2';
 import moment from 'moment';
 import 'moment/locale/es';
+import 'moment/locale/ja';
+import 'moment/locale/ru';
 import currencies from './supported-currencies.json';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -43,13 +45,16 @@ class App extends Component {
       startDate: startDate,
       endDate: endDate,
       currentPriceError: null,
-      currentPriceLabelStyle : "initialVisible",
-      lastUpdateDate : ""
+      currentPriceLabelStyle: "initialVisible",
+      lastUpdateDate: null
     };
+
+    moment.locale(this.state.culture);
+
     this.onCurrencySelect = this.onCurrencySelect.bind(this);
     this.onCultureSelect = this.onCultureSelect.bind(this);
 
-  }  
+  }
 
   componentDidMount() {
     this.getHistoricalData();
@@ -64,14 +69,14 @@ class App extends Component {
 
   updateCurrentPrice() {
 
-    this.setState({ currentPriceLabelStyle : "fadeOut"});
+    this.setState({ currentPriceLabelStyle: "fadeOut" });
 
     this.getCurrentPrice();
 
     setTimeout(() => {
-      this.setState({ currentPriceLabelStyle : "fadeIn"});            
-    }, 300);                
-    
+      this.setState({ currentPriceLabelStyle: "fadeIn" });
+    }, 300);
+
   }
 
   endDate_handleChange(date) {
@@ -97,7 +102,7 @@ class App extends Component {
   getCurrentPrice() {
     fetch(`https://api.coindesk.com/v1/bpi/currentprice/${this.state.currency}.json`)
       .then(response => response.json())
-      .then(currentPrice => this.setState({ currentPrice, currentPriceError: null, lastUpdateDate: moment(new Date()).format("HH:mm:ss A") }))
+      .then(currentPrice => this.setState({ currentPrice, currentPriceError: null, lastUpdateDate: new Date() }))
       .catch((error) => {
         this.setState({ currentPriceError: error.message })
       })
@@ -140,10 +145,16 @@ class App extends Component {
 
   }
 
+  formatLastUpdate() {    
+    if (this.state.lastUpdateDate != null) {
+      return moment(this.state.lastUpdateDate).format("HH:mm:ss A");
+    }
+  }
+
   formatChartData() {
 
     const { bpi } = this.state.historicalData;
-    moment.locale(this.state.culture);
+    
     return {
       labels: Object.keys(bpi).map(date => moment(date).format("ll")),
       datasets: [
@@ -181,8 +192,9 @@ class App extends Component {
     this.setCurrency(e.target.value)
   }
 
-  setCulture(culture) {
+  setCulture(culture) {    
     this.setState({ culture });
+    moment.locale(culture);
   }
 
   onCultureSelect(e) {
@@ -193,7 +205,7 @@ class App extends Component {
     return (
       <div className="app">
         <Header title="BITCOIN PRICE LIVE" />
-        <Container  fluid style={{ lineHeight: '32px' }}>
+        <Container fluid style={{ lineHeight: '32px' }}>
           <Row justify="end">
             <Col xs="content" >
               <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Select your currency: </span>
@@ -209,26 +221,26 @@ class App extends Component {
                   <a href="#" className="link" onClick={() => this.setCurrency('USD')} style={{color: "black", fontSize: 16, fontFamily: 'Arial Black'}}> [CLICK HERE TO RESET] </a>
                 </div>) */
               }
-          </Col>
-        </Row>
-        <Row justify="end">
-          <Col xs="content">        
-            <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Select your culture: </span>
-          </Col>
-          <Col xs={6}>
-            <select className="input-element" value={this.state.culture} onChange={this.onCultureSelect}>
-              <option value="en-US"> United States </option>
-              <option value="ja"> Japan </option>
-              <option value="ru"> Russia </option>
-              <option value="es"> Spain </option>              
-            </select>
-          </Col>
+            </Col>
           </Row>
           <Row justify="end">
-            <Col xs="content">        
+            <Col xs="content">
+              <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Select your culture: </span>
+            </Col>
+            <Col xs={6}>
+              <select className="input-element" value={this.state.culture} onChange={this.onCultureSelect}>
+                <option value="en-US"> United States </option>
+                <option value="ja"> Japan </option>
+                <option value="ru"> Russia </option>
+                <option value="es"> Spain </option>
+              </select>
+            </Col>
+          </Row>
+          <Row justify="end">
+            <Col xs="content">
               <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Start date: </span>
             </Col>
-            <Col xs={6}>        
+            <Col xs={6}>
               <DatePicker className="input-element"
                 selected={this.state.startDate}
                 onChange={this.startDate_handleChange.bind(this)}
@@ -239,10 +251,10 @@ class App extends Component {
             </Col>
           </Row>
           <Row justify="end">
-            <Col xs="content">        
+            <Col xs="content">
               <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> End date: </span>
             </Col>
-            <Col xs={6}>        
+            <Col xs={6}>
               <DatePicker className="input-element"
                 selected={this.state.endDate}
                 onChange={this.endDate_handleChange.bind(this)}
@@ -253,32 +265,32 @@ class App extends Component {
             </Col>
           </Row>
           <Row justify="end">
-            <Col xs="content">        
+            <Col xs="content">
               <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}>
-                    Last price:</span>
+                Last price:</span>
             </Col>
-            <Col xs={6}>        
-              {this.state.currentPriceError? 
-                (<span>{this.state.currentPriceError}</span>):
+            <Col xs={6}>
+              {this.state.currentPriceError ?
+                (<span>{this.state.currentPriceError}</span>) :
                 (this.state.currentPrice ? (
                   <span>
-                  <span className={`${this.state.currentPriceLabelStyle} dataLabel`}>{this.formatCurrectPrice()}</span>                    
-                  &nbsp;&nbsp;&nbsp;<span style={{ fontSize: 12, fontFamily: 'Arial' }} className={this.state.currentPriceLabelStyle}>{this.state.lastUpdateDate}</span>
+                    <span className={`${this.state.currentPriceLabelStyle} dataLabel`}>{this.formatCurrectPrice()}</span>
+                    &nbsp;&nbsp;&nbsp;<span style={{ fontSize: 12, fontFamily: 'Arial' }} className={this.state.currentPriceLabelStyle}>{this.formatLastUpdate()}</span>
                   </span>
-                  ) : (<span>Loading...</span>))
-              }                                        
+                ) : (<span>Loading...</span>))
+              }
             </Col>
           </Row>
         </Container>
-          <br />
-          {this.state.historicalDataError? 
-            (<span>{this.state.historicalDataError}</span>):
-            (this.state.historicalData ? (
-              <Line options={this.chartOptions()} data={this.formatChartData()} height={250} />
-              ) : (<span>Loading...</span>)
-            )
-          }
-        
+        <br />
+        {this.state.historicalDataError ?
+          (<span>{this.state.historicalDataError}</span>) :
+          (this.state.historicalData ? (
+            <Line options={this.chartOptions()} data={this.formatChartData()} height={250} />
+          ) : (<span>Loading...</span>)
+          )
+        }
+
       </div>
     )
   }
