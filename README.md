@@ -1,4 +1,6 @@
-Live Demo: https://bitcoinpricelive.azurewebsites.net/
+*Live Demo*: https://bitcoinpricelive.azurewebsites.net/
+
+############################################################
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
