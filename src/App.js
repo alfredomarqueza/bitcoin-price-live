@@ -208,7 +208,7 @@ class App extends Component {
         <Container fluid style={{ lineHeight: '32px' }}>
           <Row justify="end">
             <Col xs="content" >
-              <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Select your currency: </span>
+              <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Currency: </span>
             </Col>
             <Col xs={6} >
               <select className="input-element" value={this.state.currency} onChange={this.onCurrencySelect}>
@@ -225,7 +225,7 @@ class App extends Component {
           </Row>
           <Row justify="end">
             <Col xs="content">
-              <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Select your culture: </span>
+              <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Culture: </span>
             </Col>
             <Col xs={6}>
               <select className="input-element" value={this.state.culture} onChange={this.onCultureSelect}>

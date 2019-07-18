@@ -1,8 +1,8 @@
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Arial Black', cursive;
+  font-family: 'Arial Black';
 }
 
-span.arialBlack { font-family: 'Arial Black', cursive; }
+span.arialBlack { font-family: 'Arial Black'; }
 
 .app {
   max-width: 720px;
@@ -10,12 +10,12 @@ span.arialBlack { font-family: 'Arial Black', cursive; }
   /* text-align: center; */
 }
 
-.header { font-size: 60px; font-family: 'Arial Black', cursive; }
-.subheader { font-size: 20px; font-family: 'Arial Black', cursive; }
+.header { font-size: 30px; font-family: 'Arial Black'; }
+.subheader { font-size: 20px; font-family: 'Arial Black'; }
 
 a.link {
   text-decoration: none;
-  color: #ff1769;
+  color: #6f7296;
 }
 
 .initialVisible {     
@@ -50,14 +50,14 @@ a.link:hover {
   -webkit-appearance: none; */
   cursor: pointer;
   font-size: 15px;
-  font-family: 'Arial Black', cursive;  
+  font-family: 'Arial Black';  
   color: #137e81;
 }
 
 .dataLabel
 {
   font-size: 15px;
-  font-family: 'Arial Black', cursive;  
+  font-family: 'Arial Black';  
   color: #137e81;
 }
 
