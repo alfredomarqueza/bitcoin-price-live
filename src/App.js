@@ -31,6 +31,8 @@ class App extends Component {
 
     this.currectPriceRef = React.createRef();
     this.lastUpdateRef = React.createRef();
+    this.currentPriceErrorRef = React.createRef();
+    this.currectPriceContainerRef= React.createRef();
 
     // chart.js defaults
     Chart.defaults.global.defaultFontColor = '#000';
@@ -45,8 +47,7 @@ class App extends Component {
       currency: "USD",
       culture: "en-US",
       startDate: startDate,
-      endDate: endDate,
-      currentPriceError: null
+      endDate: endDate
     };
 
     moment.locale(this.state.culture);
@@ -58,8 +59,7 @@ class App extends Component {
 
   componentDidMount() {
 
-    this.lastUpdateRef.current.className = "initialVisible";
-    this.currectPriceRef.current.className = "initialVisible dataLabel";
+    this.currectPriceContainerRef.current.className = "initialVisible";
 
     this.getHistoricalData();
     this.getCurrentPrice();
@@ -73,15 +73,13 @@ class App extends Component {
 
   updateCurrentPrice() {
 
-    this.lastUpdateRef.current.className = "fadeOut";
-    this.currectPriceRef.current.className = "fadeOut dataLabel";
+    this.currectPriceContainerRef.current.className = "fadeOut";
 
     this.getCurrentPrice();
 
     setTimeout(() => {
 
-      this.lastUpdateRef.current.className = "fadeIn";
-      this.currectPriceRef.current.className = "fadeIn dataLabel";
+      this.currectPriceContainerRef.current.className = "fadeIn";
     }, 300);
 
   }
@@ -112,15 +110,24 @@ class App extends Component {
       .then(currentPrice => {
         if (currentPrice.bpi[this.state.currency] != null) {
 
+          this.currentPriceErrorRef.current.style.display = "none";
+          this.currectPriceContainerRef.current.style.display = "inline";
           const rate_float = currentPrice.bpi[this.state.currency].rate_float;
 
           this.currectPriceRef.current.textContent = Intl.NumberFormat(this.state.culture,
             { style: 'currency', currency: this.state.currency })
             .format(rate_float);
           this.lastUpdateRef.current.textContent = moment(new Date()).format("HH:mm:ss A");
-        }})
-      .catch((error) => {
-        this.setState({ currentPriceError: error.message })
+        } else {          
+          this.currectPriceContainerRef.current.style.display = "none";
+          this.currentPriceErrorRef.current.style.display = "inline";
+          this.currentPriceErrorRef.current.textContent = "Currency not found";
+        }
+      })
+      .catch((error) => {                
+        this.currectPriceContainerRef.current.style.display = "none";
+        this.currentPriceErrorRef.current.style.display = "inline";
+        this.currentPriceErrorRef.current.textContent = error.message;
       })
   }
 
@@ -268,15 +275,12 @@ class App extends Component {
                 Last price:</span>
             </Col>
             <Col xs={6}>
-              {this.state.currentPriceError ?
-                (<span>{this.state.currentPriceError}</span>) :
-                (
-                  <span>
-                    <span ref={this.currectPriceRef}></span>
+              <span style={{ color: 'red', display: 'none' }} ref={this.currentPriceErrorRef}></span>
+              <span ref={this.currectPriceContainerRef}>
+                <span className="dataLabel" ref={this.currectPriceRef}></span>
                     &nbsp;&nbsp;&nbsp;<span style={{ fontSize: 12, fontFamily: 'Arial' }} ref={this.lastUpdateRef}></span>
-                  </span>
-                )
-              }
+              </span>
+
             </Col>
           </Row>
         </Container>
