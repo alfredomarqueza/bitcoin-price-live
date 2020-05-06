@@ -29,6 +29,9 @@ class App extends Component {
   constructor(props) {
     super(props)
 
+    this.currectPriceRef = React.createRef();
+    this.lastUpdateRef = React.createRef();
+
     // chart.js defaults
     Chart.defaults.global.defaultFontColor = '#000';
     Chart.defaults.global.defaultFontSize = 14;
@@ -39,14 +42,11 @@ class App extends Component {
 
     this.state = {
       historicalData: null,
-      currentPrice: null,
       currency: "USD",
       culture: "en-US",
       startDate: startDate,
       endDate: endDate,
-      currentPriceError: null,
-      currentPriceLabelStyle: "initialVisible",
-      lastUpdateDate: null
+      currentPriceError: null
     };
 
     moment.locale(this.state.culture);
@@ -57,6 +57,10 @@ class App extends Component {
   }
 
   componentDidMount() {
+
+    this.lastUpdateRef.current.className = "initialVisible";
+    this.currectPriceRef.current.className = "initialVisible dataLabel";
+
     this.getHistoricalData();
     this.getCurrentPrice();
 
@@ -69,12 +73,15 @@ class App extends Component {
 
   updateCurrentPrice() {
 
-    this.setState({ currentPriceLabelStyle: "fadeOut" });
+    this.lastUpdateRef.current.className = "fadeOut";
+    this.currectPriceRef.current.className = "fadeOut dataLabel";
 
     this.getCurrentPrice();
 
     setTimeout(() => {
-      this.setState({ currentPriceLabelStyle: "fadeIn" });
+
+      this.lastUpdateRef.current.className = "fadeIn";
+      this.currectPriceRef.current.className = "fadeIn dataLabel";
     }, 300);
 
   }
@@ -102,7 +109,16 @@ class App extends Component {
   getCurrentPrice() {
     fetch(`https://api.coindesk.com/v1/bpi/currentprice/${this.state.currency}.json`)
       .then(response => response.json())
-      .then(currentPrice => this.setState({ currentPrice, currentPriceError: null, lastUpdateDate: new Date() }))
+      .then(currentPrice => {
+        if (currentPrice.bpi[this.state.currency] != null) {
+
+          const rate_float = currentPrice.bpi[this.state.currency].rate_float;
+
+          this.currectPriceRef.current.textContent = Intl.NumberFormat(this.state.culture,
+            { style: 'currency', currency: this.state.currency })
+            .format(rate_float);
+          this.lastUpdateRef.current.textContent = moment(new Date()).format("HH:mm:ss A");
+        }})
       .catch((error) => {
         this.setState({ currentPriceError: error.message })
       })
@@ -133,28 +149,10 @@ class App extends Component {
     }
   }
 
-  formatCurrectPrice() {
-    if (this.state.currentPrice != null && this.state.currentPrice.bpi[this.state.currency] != null) {
-
-      const rate_float = this.state.currentPrice.bpi[this.state.currency].rate_float;
-
-      return Intl.NumberFormat(this.state.culture,
-        { style: 'currency', currency: this.state.currency })
-        .format(rate_float);
-    }
-
-  }
-
-  formatLastUpdate() {    
-    if (this.state.lastUpdateDate != null) {
-      return moment(this.state.lastUpdateDate).format("HH:mm:ss A");
-    }
-  }
-
   formatChartData() {
 
     const { bpi } = this.state.historicalData;
-    
+
     return {
       labels: Object.keys(bpi).map(date => moment(date).format("ll")),
       datasets: [
@@ -192,7 +190,7 @@ class App extends Component {
     this.setCurrency(e.target.value)
   }
 
-  setCulture(culture) {    
+  setCulture(culture) {
     this.setState({ culture });
     moment.locale(culture);
   }
@@ -272,12 +270,12 @@ class App extends Component {
             <Col xs={6}>
               {this.state.currentPriceError ?
                 (<span>{this.state.currentPriceError}</span>) :
-                (this.state.currentPrice ? (
+                (
                   <span>
-                    <span className={`${this.state.currentPriceLabelStyle} dataLabel`}>{this.formatCurrectPrice()}</span>
-                    &nbsp;&nbsp;&nbsp;<span style={{ fontSize: 12, fontFamily: 'Arial' }} className={this.state.currentPriceLabelStyle}>{this.formatLastUpdate()}</span>
+                    <span ref={this.currectPriceRef}></span>
+                    &nbsp;&nbsp;&nbsp;<span style={{ fontSize: 12, fontFamily: 'Arial' }} ref={this.lastUpdateRef}></span>
                   </span>
-                ) : (<span>Loading...</span>))
+                )
               }
             </Col>
           </Row>
