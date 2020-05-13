@@ -121,11 +121,11 @@ class App extends Component {
         this.currentPriceErrorRef.current.style.display = "inline";
         this.currentPriceErrorRef.current.textContent = error.message;
       })
-      .finally()
-    {
-      if (callback != null)
-        callback();
-    }
+      .finally(() => {
+        if (callback != null)
+          callback();
+      })
+
   }
 
   setCurrency(currency) {
