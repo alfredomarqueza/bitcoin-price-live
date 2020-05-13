@@ -1,13 +1,12 @@
 // Bitcoin Price Live
-// 2019
+// 2020
 // By @alfredomarqueza
-// Base version by @MarkFChavez
 
 import React, { Component } from 'react';
 import Header from './components/Header';
+import BtcChart from './BtcChart';
 import './App.css';
 import { Container, Row, Col } from 'react-grid-system';
-import { Line, Chart } from 'react-chartjs-2';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/ja';
@@ -32,18 +31,13 @@ class App extends Component {
     this.currectPriceRef = React.createRef();
     this.lastUpdateRef = React.createRef();
     this.currentPriceErrorRef = React.createRef();
-    this.currectPriceContainerRef= React.createRef();
-
-    // chart.js defaults
-    Chart.defaults.global.defaultFontColor = '#000';
-    Chart.defaults.global.defaultFontSize = 14;
+    this.currectPriceContainerRef = React.createRef();
 
     let endDate = new Date();
     let startDate = new Date();
     startDate.setMonth(startDate.getMonth() - 1);
 
     this.state = {
-      historicalData: null,
       currency: "USD",
       culture: "en-US",
       startDate: startDate,
@@ -52,16 +46,14 @@ class App extends Component {
 
     moment.locale(this.state.culture);
 
-    this.onCurrencySelect = this.onCurrencySelect.bind(this);
-    this.onCultureSelect = this.onCultureSelect.bind(this);
-
   }
+
+  // Start events
 
   componentDidMount() {
 
     this.currectPriceContainerRef.current.className = "initialVisible";
 
-    this.getHistoricalData();
     this.getCurrentPrice();
 
     this.interval = setInterval(this.updateCurrentPrice.bind(this), 10000);
@@ -71,40 +63,38 @@ class App extends Component {
     clearInterval(this.interval);
   }
 
+  onChangeEndDate = (date) => {
+    this.setState({ endDate: date });
+  }
+
+  onChangeStartDate = (date) => {
+    this.setState({ startDate: date });
+  }
+
+  onSelectCulture = (e) => {
+    this.setCulture(e.target.value)
+  }
+
+  onSelectCurrency = (e) => {
+    this.setCurrency(e.target.value)
+  }
+
+  // end events
+
   updateCurrentPrice() {
 
     this.currectPriceContainerRef.current.className = "fadeOut";
 
-    this.getCurrentPrice();
-
     setTimeout(() => {
 
-      this.currectPriceContainerRef.current.className = "fadeIn";
-    }, 300);
+      this.getCurrentPrice(() => { this.currectPriceContainerRef.current.className = "fadeIn"; });
+
+    }, 1000);
 
   }
 
-  endDate_handleChange(date) {
-    this.setState({ endDate: date }, () => { this.getHistoricalData(); });
-  }
+  getCurrentPrice = (callback = null) => {
 
-  startDate_handleChange(date) {
-    this.setState({ startDate: date }, () => { this.getHistoricalData(); });
-  }
-
-  getHistoricalData() {
-    let startDate = moment(this.state.startDate).format("YYYY-MM-DD");
-    let endDate = moment(this.state.endDate).format("YYYY-MM-DD");
-
-    fetch(`https://api.coindesk.com/v1/bpi/historical/close.json?currency=${this.state.currency}&start=${startDate}&end=${endDate}`)
-      .then(response => response.json())
-      .then(historicalData => this.setState({ historicalData, historicalDataError: null }))
-      .catch((error) => {
-        this.setState({ historicalDataError: error.message })
-      })
-  }
-
-  getCurrentPrice() {
     fetch(`https://api.coindesk.com/v1/bpi/currentprice/${this.state.currency}.json`)
       .then(response => response.json())
       .then(currentPrice => {
@@ -118,92 +108,31 @@ class App extends Component {
             { style: 'currency', currency: this.state.currency })
             .format(rate_float);
           this.lastUpdateRef.current.textContent = moment(new Date()).format("HH:mm:ss A");
-        } else {          
+        } else {
           this.currectPriceContainerRef.current.style.display = "none";
           this.currentPriceErrorRef.current.style.display = "inline";
           this.currentPriceErrorRef.current.textContent = "Currency not found";
         }
       })
-      .catch((error) => {                
+      .catch((error) => {
         this.currectPriceContainerRef.current.style.display = "none";
         this.currentPriceErrorRef.current.style.display = "inline";
         this.currentPriceErrorRef.current.textContent = error.message;
       })
-  }
-
-  chartOptions() {
-
-    return {
-      scales: {
-        yAxes: [{
-          ticks: {
-
-            callback: ((value, index, values) => {
-              return new Intl.NumberFormat(this.state.culture, { style: 'currency', currency: this.state.currency }).format(value);
-            })//.bind(this)
-          }
-        }]
-      },
-
-      tooltips: {
-        callbacks: {
-          label: function (tooltipItem, data) {
-            var value = data.datasets[0].data[tooltipItem.index];
-            return new Intl.NumberFormat(this.state.culture, { style: 'currency', currency: this.state.currency }).format(value);
-          }.bind(this)
-        }
-      }
-    }
-  }
-
-  formatChartData() {
-
-    const { bpi } = this.state.historicalData;
-
-    return {
-      labels: Object.keys(bpi).map(date => moment(date).format("ll")),
-      datasets: [
-        {
-
-          label: "Bitcoin price",
-          fill: true,
-          lineTension: 0.1,
-          backgroundColor: 'rgba(100,71,192,0.4)',
-          borderColor: 'rgba(100,71,192,1)',
-          borderCapStyle: 'butt',
-          borderDash: [],
-          borderDashOffset: 0.0,
-          borderJoinStyle: 'miter',
-          pointBorderColor: 'rgba(100,71,192,1)',
-          pointBackgroundColor: '#fff',
-          pointBorderWidth: 1,
-          pointHoverRadius: 5,
-          pointHoverBackgroundColor: 'rgba(100,71,192,1)',
-          pointHoverBorderColor: 'rgba(220,220,220,1)',
-          pointHoverBorderWidth: 2,
-          pointRadius: 1,
-          pointHitRadius: 10,
-          data: Object.values(bpi)
-        }
-      ]
+      .finally()
+    {
+      if (callback != null)
+        callback();
     }
   }
 
   setCurrency(currency) {
-    this.setState({ currency }, () => { this.getHistoricalData(); this.getCurrentPrice(); });
-  }
-
-  onCurrencySelect(e) {
-    this.setCurrency(e.target.value)
+    this.setState({ currency }, () => { this.getCurrentPrice(); });
   }
 
   setCulture(culture) {
-    this.setState({ culture });
     moment.locale(culture);
-  }
-
-  onCultureSelect(e) {
-    this.setCulture(e.target.value)
+    this.setState({ culture }, () => { this.getCurrentPrice(); });
   }
 
   render() {
@@ -216,7 +145,7 @@ class App extends Component {
               <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Currency: </span>
             </Col>
             <Col xs={6} >
-              <select className="input-element" value={this.state.currency} onChange={this.onCurrencySelect}>
+              <select className="input-element" value={this.state.currency} onChange={this.onSelectCurrency}>
                 {currencies.map((obj, index) =>
                   <option key={`${index}-${obj.country}`} value={obj.currency}> {obj.currency} - {obj.country}</option>
                 )}
@@ -233,7 +162,7 @@ class App extends Component {
               <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Culture: </span>
             </Col>
             <Col xs={6}>
-              <select className="input-element" value={this.state.culture} onChange={this.onCultureSelect}>
+              <select className="input-element" value={this.state.culture} onChange={this.onSelectCulture}>
                 <option value="en-US"> United States </option>
                 <option value="ja"> Japan </option>
                 <option value="ru"> Russia </option>
@@ -248,7 +177,7 @@ class App extends Component {
             <Col xs={6}>
               <DatePicker className="input-element"
                 selected={this.state.startDate}
-                onChange={this.startDate_handleChange.bind(this)}
+                onChange={this.onChangeStartDate}
                 dateFormat="MMMM d, yyyy"
                 locale={this.state.culture}
                 maxDate={new Date()}
@@ -262,7 +191,7 @@ class App extends Component {
             <Col xs={6}>
               <DatePicker className="input-element"
                 selected={this.state.endDate}
-                onChange={this.endDate_handleChange.bind(this)}
+                onChange={this.onChangeEndDate}
                 dateFormat="MMMM d, yyyy"
                 locale={this.state.culture}
                 maxDate={new Date()}
@@ -285,13 +214,9 @@ class App extends Component {
           </Row>
         </Container>
         <br />
-        {this.state.historicalDataError ?
-          (<span>{this.state.historicalDataError}</span>) :
-          (this.state.historicalData ? (
-            <Line options={this.chartOptions()} data={this.formatChartData()} height={250} />
-          ) : (<span>Loading...</span>)
-          )
-        }
+
+        <BtcChart currency={this.state.currency} culture={this.state.culture}
+          startDate={this.state.startDate} endDate={this.state.endDate} />
 
       </div>
     )
