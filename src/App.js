@@ -36,6 +36,8 @@ class App extends Component {
     let endDate = new Date();
     let startDate = new Date();
     startDate.setMonth(startDate.getMonth() - 1);
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(0, 0, 0, 0);
 
     this.state = {
       currency: "USD",
@@ -48,7 +50,7 @@ class App extends Component {
 
   }
 
-  // Start events
+  //#region Events functions
 
   componentDidMount() {
 
@@ -79,7 +81,7 @@ class App extends Component {
     this.setCurrency(e.target.value)
   }
 
-  // end events
+  //#endregion
 
   updateCurrentPrice() {
 
