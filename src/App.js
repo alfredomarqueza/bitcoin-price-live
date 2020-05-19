@@ -6,7 +6,8 @@ import React, { Component } from 'react';
 import Header from './components/Header';
 import BtcChart from './BtcChart';
 import './App.css';
-import { Container, Row, Col } from 'react-grid-system';
+import { Container, Row, Col } from 'reactstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/ja';
@@ -142,8 +143,8 @@ class App extends Component {
       <div className="app">
         <Header title="BITCOIN PRICE LIVE" />
         <Container fluid style={{ lineHeight: '32px' }}>
-          <Row justify="end">
-            <Col xs="content" >
+          <Row className="justify-content-end">
+            <Col  xs="content" >
               <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Currency: </span>
             </Col>
             <Col xs={6} >
@@ -159,7 +160,7 @@ class App extends Component {
               }
             </Col>
           </Row>
-          <Row justify="end">
+          <Row className="justify-content-end">
             <Col xs="content">
               <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Culture: </span>
             </Col>
@@ -172,7 +173,7 @@ class App extends Component {
               </select>
             </Col>
           </Row>
-          <Row justify="end">
+          <Row className="justify-content-end">
             <Col xs="content">
               <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Start date: </span>
             </Col>
@@ -186,7 +187,7 @@ class App extends Component {
               />
             </Col>
           </Row>
-          <Row justify="end">
+          <Row className="justify-content-end">
             <Col xs="content">
               <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> End date: </span>
             </Col>
@@ -200,7 +201,7 @@ class App extends Component {
               />
             </Col>
           </Row>
-          <Row justify="end">
+          <Row className="justify-content-end">
             <Col xs="content">
               <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}>
                 Last price:</span>

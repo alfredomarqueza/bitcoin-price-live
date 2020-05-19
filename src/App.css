@@ -48,6 +48,7 @@ a.link:hover {
   background: transparent;
   background-image: none;
   -webkit-appearance: none; */
+  line-height: initial;
   cursor: pointer;
   font-size: 15px;
   font-family: 'Arial Black';  
