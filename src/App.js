@@ -1,4 +1,4 @@
-// Bitcoin Price Live
+// Bitcoin Price Predictor
 // 2020
 // By @alfredomarqueza
 
@@ -42,9 +42,9 @@ class App extends Component {
 
     this.state = {
       currency: "USD",
-      culture: "en-US",
       startDate: startDate,
-      endDate: endDate
+      endDate: endDate,
+      culture: "en-US"
     };
 
     moment.locale(this.state.culture);
@@ -72,10 +72,6 @@ class App extends Component {
 
   onChangeStartDate = (date) => {
     this.setState({ startDate: date });
-  }
-
-  onSelectCulture = (e) => {
-    this.setCulture(e.target.value)
   }
 
   onSelectCurrency = (e) => {
@@ -133,18 +129,13 @@ class App extends Component {
     this.setState({ currency }, () => { this.getCurrentPrice(); });
   }
 
-  setCulture(culture) {
-    moment.locale(culture);
-    this.setState({ culture }, () => { this.getCurrentPrice(); });
-  }
-
   render() {
     return (
       <div className="app">
-        <Header title="BITCOIN PRICE LIVE" />
+        <Header />
         <Container fluid style={{ lineHeight: '32px' }}>
           <Row className="justify-content-end">
-            <Col  xs="content" >
+            <Col xs="content" >
               <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Currency: </span>
             </Col>
             <Col xs={6} >
@@ -158,19 +149,6 @@ class App extends Component {
                   <a href="#" className="link" onClick={() => this.setCurrency('USD')} style={{color: "black", fontSize: 16, fontFamily: 'Arial Black'}}> [CLICK HERE TO RESET] </a>
                 </div>) */
               }
-            </Col>
-          </Row>
-          <Row className="justify-content-end">
-            <Col xs="content">
-              <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Culture: </span>
-            </Col>
-            <Col xs={6}>
-              <select className="input-element" value={this.state.culture} onChange={this.onSelectCulture}>
-                <option value="en-US"> United States </option>
-                <option value="ja"> Japan </option>
-                <option value="ru"> Russia </option>
-                <option value="es"> Spain </option>
-              </select>
             </Col>
           </Row>
           <Row className="justify-content-end">
