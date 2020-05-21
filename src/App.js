@@ -3,6 +3,8 @@
 // By @alfredomarqueza
 
 import React, { Component } from 'react';
+import { Provider } from 'react-redux';
+import store from './redux/store';
 import Header from './components/Header';
 import BtcChart from './BtcChart';
 import './App.css';
@@ -44,10 +46,22 @@ class App extends Component {
       currency: "USD",
       startDate: startDate,
       endDate: endDate,
-      culture: "en-US"
+      culture: 'en-US'
     };
 
     moment.locale(this.state.culture);
+
+    store.subscribe(() => {
+      // When state will be updated(in our case, when culture will be fetched), 
+      // we will update local component state and force component to rerender 
+      // with new data.
+
+      this.setState({
+        culture: store.getState().culture
+      });
+
+      this.getCurrentPrice();
+    });
 
   }
 
@@ -131,75 +145,77 @@ class App extends Component {
 
   render() {
     return (
-      <div className="app">
-        <Header />
-        <Container fluid style={{ lineHeight: '32px' }}>
-          <Row className="justify-content-end">
-            <Col xs="content" >
-              <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Currency: </span>
-            </Col>
-            <Col xs={6} >
-              <select className="input-element" value={this.state.currency} onChange={this.onSelectCurrency}>
-                {currencies.map((obj, index) =>
-                  <option key={`${index}-${obj.country}`} value={obj.currency}> {obj.currency} - {obj.country}</option>
-                )}
-              </select>
-              {
-                /* this.state.currency !== 'USD' && (<div>
-                  <a href="#" className="link" onClick={() => this.setCurrency('USD')} style={{color: "black", fontSize: 16, fontFamily: 'Arial Black'}}> [CLICK HERE TO RESET] </a>
-                </div>) */
-              }
-            </Col>
-          </Row>
-          <Row className="justify-content-end">
-            <Col xs="content">
-              <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Start date: </span>
-            </Col>
-            <Col xs={6}>
-              <DatePicker className="input-element"
-                selected={this.state.startDate}
-                onChange={this.onChangeStartDate}
-                dateFormat="MMMM d, yyyy"
-                locale={this.state.culture}
-                maxDate={new Date()}
-              />
-            </Col>
-          </Row>
-          <Row className="justify-content-end">
-            <Col xs="content">
-              <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> End date: </span>
-            </Col>
-            <Col xs={6}>
-              <DatePicker className="input-element"
-                selected={this.state.endDate}
-                onChange={this.onChangeEndDate}
-                dateFormat="MMMM d, yyyy"
-                locale={this.state.culture}
-                maxDate={new Date()}
-              />
-            </Col>
-          </Row>
-          <Row className="justify-content-end">
-            <Col xs="content">
-              <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}>
-                Last price:</span>
-            </Col>
-            <Col xs={6}>
-              <span style={{ color: 'red', display: 'none' }} ref={this.currentPriceErrorRef}></span>
-              <span ref={this.currectPriceContainerRef}>
-                <span className="dataLabel" ref={this.currectPriceRef}></span>
+      <Provider store={store}>
+        <div className="app">
+          <Header />
+          <Container fluid style={{ lineHeight: '32px' }}>
+            <Row className="justify-content-end">
+              <Col xs="content" >
+                <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Currency: </span>
+              </Col>
+              <Col xs={6} >
+                <select className="input-element" value={this.state.currency} onChange={this.onSelectCurrency}>
+                  {currencies.map((obj, index) =>
+                    <option key={`${index}-${obj.country}`} value={obj.currency}> {obj.currency} - {obj.country}</option>
+                  )}
+                </select>
+                {
+                  /* this.state.currency !== 'USD' && (<div>
+                    <a href="#" className="link" onClick={() => this.setCurrency('USD')} style={{color: "black", fontSize: 16, fontFamily: 'Arial Black'}}> [CLICK HERE TO RESET] </a>
+                  </div>) */
+                }
+              </Col>
+            </Row>
+            <Row className="justify-content-end">
+              <Col xs="content">
+                <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> Start date: </span>
+              </Col>
+              <Col xs={6}>
+                <DatePicker className="input-element"
+                  selected={this.state.startDate}
+                  onChange={this.onChangeStartDate}
+                  dateFormat="MMMM d, yyyy"
+                  locale={this.state.culture}
+                  maxDate={new Date()}
+                />
+              </Col>
+            </Row>
+            <Row className="justify-content-end">
+              <Col xs="content">
+                <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}> End date: </span>
+              </Col>
+              <Col xs={6}>
+                <DatePicker className="input-element"
+                  selected={this.state.endDate}
+                  onChange={this.onChangeEndDate}
+                  dateFormat="MMMM d, yyyy"
+                  locale={this.state.culture}
+                  maxDate={new Date()}
+                />
+              </Col>
+            </Row>
+            <Row className="justify-content-end">
+              <Col xs="content">
+                <span style={{ fontSize: 18, fontFamily: 'Arial Black' }}>
+                  Last price:</span>
+              </Col>
+              <Col xs={6}>
+                <span style={{ color: 'red', display: 'none' }} ref={this.currentPriceErrorRef}></span>
+                <span ref={this.currectPriceContainerRef}>
+                  <span className="dataLabel" ref={this.currectPriceRef}></span>
                     &nbsp;&nbsp;&nbsp;<span style={{ fontSize: 12, fontFamily: 'Arial' }} ref={this.lastUpdateRef}></span>
-              </span>
+                </span>
 
-            </Col>
-          </Row>
-        </Container>
-        <br />
+              </Col>
+            </Row>
+          </Container>
+          <br />
 
-        <BtcChart currency={this.state.currency} culture={this.state.culture}
-          startDate={this.state.startDate} endDate={this.state.endDate} />
+          <BtcChart currency={this.state.currency} culture={this.state.culture}
+            startDate={this.state.startDate} endDate={this.state.endDate} />
 
-      </div>
+        </div>
+      </Provider>
     )
   }
 }
