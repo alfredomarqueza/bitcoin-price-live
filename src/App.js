@@ -1,4 +1,4 @@
-// Bitcoin Price Predictor
+// Bitcoin Price Live
 // 2020
 // By @alfredomarqueza
 
@@ -51,8 +51,8 @@ class App extends Component {
 
     moment.locale(this.state.culture);
 
-    store.subscribe(() => {
-      
+    this.unsubscribe = store.subscribe(() => {
+
       this.setState({
         culture: store.getState().culture
       });
@@ -75,6 +75,7 @@ class App extends Component {
 
   componentWillUnmount() {
     clearInterval(this.interval);
+    this.unsubscribe();
   }
 
   onChangeEndDate = (date) => {

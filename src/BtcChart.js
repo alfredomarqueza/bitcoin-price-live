@@ -18,7 +18,7 @@ class BtcChart extends Component {
             culture: store.getState().culture
         };
 
-        store.subscribe(() => {
+        this.unsubscribe = store.subscribe(() => {
 
             this.setState({
                 culture: store.getState().culture
@@ -39,6 +39,10 @@ class BtcChart extends Component {
 
             this.getHistoricalData();
         }
+    }
+
+    componentWillUnmount() {
+        this.unsubscribe();
     }
 
     getHistoricalData() {
