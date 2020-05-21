@@ -6,7 +6,7 @@ import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import store from './redux/store';
 import Header from './components/Header';
-import BtcChart from './BtcChart';
+import BtcChart from './components/BtcChart';
 import './App.css';
 import { Container, Row, Col } from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';

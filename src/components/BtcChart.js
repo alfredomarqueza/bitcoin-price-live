@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import store from './redux/store';
+import { connect } from 'react-redux';
 import { Line, Chart } from 'react-chartjs-2';
 import moment from 'moment';
-
 
 class BtcChart extends Component {
     constructor(props) {
@@ -14,16 +13,8 @@ class BtcChart extends Component {
 
         this.state = {
             historicalData: null,
-            historicalDataError: null,
-            culture: store.getState().culture
+            historicalDataError: null
         };
-
-        this.unsubscribe = store.subscribe(() => {
-
-            this.setState({
-                culture: store.getState().culture
-            });
-        });
 
     }
 
@@ -39,10 +30,6 @@ class BtcChart extends Component {
 
             this.getHistoricalData();
         }
-    }
-
-    componentWillUnmount() {
-        this.unsubscribe();
     }
 
     getHistoricalData() {
@@ -65,7 +52,7 @@ class BtcChart extends Component {
                     ticks: {
 
                         callback: ((value, index, values) => {
-                            return new Intl.NumberFormat(this.state.culture, { style: 'currency', currency: this.props.currency }).format(value);
+                            return new Intl.NumberFormat(this.props.culture, { style: 'currency', currency: this.props.currency }).format(value);
                         })//.bind(this)
                     }
                 }]
@@ -75,7 +62,7 @@ class BtcChart extends Component {
                 callbacks: {
                     label: function (tooltipItem, data) {
                         var value = data.datasets[0].data[tooltipItem.index];
-                        return new Intl.NumberFormat(this.state.culture, { style: 'currency', currency: this.props.currency }).format(value);
+                        return new Intl.NumberFormat(this.props.culture, { style: 'currency', currency: this.props.currency }).format(value);
                     }.bind(this)
                 }
             }
@@ -132,4 +119,10 @@ class BtcChart extends Component {
 }
 
 
-export default BtcChart;
+const mapStateToProps = state => {
+    return {
+        culture: state.culture
+    }
+}
+
+export default connect(mapStateToProps)(BtcChart);
