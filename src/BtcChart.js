@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import store from './redux/store';
 import { Line, Chart } from 'react-chartjs-2';
 import moment from 'moment';
 
@@ -13,8 +14,16 @@ class BtcChart extends Component {
 
         this.state = {
             historicalData: null,
-            historicalDataError: null
+            historicalDataError: null,
+            culture: store.getState().culture
         };
+
+        store.subscribe(() => {
+
+            this.setState({
+                culture: store.getState().culture
+            });
+        });
 
     }
 
@@ -24,12 +33,11 @@ class BtcChart extends Component {
 
     componentDidUpdate(prevProps, prevState) {                                  // Check when props change to fetch historical data        
 
-        if (prevProps.currency !== this.props.currency ||                       // Culture prop is not needed for getHistorialData, so it's excluded
+        if (prevProps.currency !== this.props.currency ||
             prevProps.startDate.getTime() !== this.props.startDate.getTime() ||
             prevProps.endDate.getTime() !== this.props.endDate.getTime()) {
 
             this.getHistoricalData();
-            //alert("did update");
         }
     }
 
@@ -53,7 +61,7 @@ class BtcChart extends Component {
                     ticks: {
 
                         callback: ((value, index, values) => {
-                            return new Intl.NumberFormat(this.props.culture, { style: 'currency', currency: this.props.currency }).format(value);
+                            return new Intl.NumberFormat(this.state.culture, { style: 'currency', currency: this.props.currency }).format(value);
                         })//.bind(this)
                     }
                 }]
@@ -63,7 +71,7 @@ class BtcChart extends Component {
                 callbacks: {
                     label: function (tooltipItem, data) {
                         var value = data.datasets[0].data[tooltipItem.index];
-                        return new Intl.NumberFormat(this.props.culture, { style: 'currency', currency: this.props.currency }).format(value);
+                        return new Intl.NumberFormat(this.state.culture, { style: 'currency', currency: this.props.currency }).format(value);
                     }.bind(this)
                 }
             }
@@ -104,7 +112,6 @@ class BtcChart extends Component {
     }
 
     render() {
-        //alert("render");
         return (
             <>
                 {this.state.historicalDataError ?

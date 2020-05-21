@@ -46,16 +46,13 @@ class App extends Component {
       currency: "USD",
       startDate: startDate,
       endDate: endDate,
-      culture: 'en-US'
+      culture: store.getState().culture
     };
 
     moment.locale(this.state.culture);
 
     store.subscribe(() => {
-      // When state will be updated(in our case, when culture will be fetched), 
-      // we will update local component state and force component to rerender 
-      // with new data.
-
+      
       this.setState({
         culture: store.getState().culture
       });
@@ -211,7 +208,7 @@ class App extends Component {
           </Container>
           <br />
 
-          <BtcChart currency={this.state.currency} culture={this.state.culture}
+          <BtcChart currency={this.state.currency}
             startDate={this.state.startDate} endDate={this.state.endDate} />
 
         </div>
