@@ -6,6 +6,7 @@
 	This legacy code shows the use of:
 	*State and Lifecycle
 	*Redux
+	*Bootstrap
 
 ## Install the project
 
